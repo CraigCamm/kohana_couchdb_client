@@ -109,11 +109,8 @@ class CouchDB_Client {
 	 */
 	public function __get($id)
 	{
-		// Get the requested document
-		$this->_documents[$id] = $this->_get_document($id);
-
-		// Return the requested document
-		return $this->_documents[$id];
+		// Get the requested document and return it
+		return $this->_get_document($id);
 	}
 
 	/**
@@ -124,40 +121,112 @@ class CouchDB_Client {
 	 */
 	protected function _get_document($id)
 	{
+		// Determine what the URI for this request should be
+		$uri = $this->_build_uri($id);
+
 		// Make the HTTP request out to the database and get the result
-		$this->_http(self::HTTP_GET, $id);
+		$json = $this->_http(self::HTTP_GET, $uri);
+
+		// Attempt to parse the response text into an object
+		$document = $this->_parse_document($json);
+
+		// Store the requested document
+		$this->_documents[$id] = $document;
+
+		// Return the document
+		return $document;
+	}
+
+	/**
+	 * Builds the URI for the request using the configuration data and passed document id
+	 *
+	 * @return  string  the URI where the requested document can be located
+	 */
+	protected function _build_uri($id)
+	{
+
 	}
 
 	/**
 	 * Gets the document that was requested from the database
 	 *
 	 * @param   string  the HTTP method (GET, PUT, POST, DELETE)
-	 * @param   string  the document id that we are requesting
-	 * @return  mixed   the parsed document
+	 * @param   string  the URI that we are requesting
+	 * @return  mixed   the response text from the remote URI
 	 */
-	protected function _http($method, $id)
+	protected function _http($method, $uri)
+	{
+		// Determine what the CURL options are for this request
+		$options = $this->_get_curl_options($method);
+
+		// Make the HTTP request out to the database and get the result
+		$response_text = Remote::get($uri, $options);
+
+		// Return the document result
+		return $response_text;
+	}
+
+	/**
+	 * Returns an array of CURL options required to make the HTTP request work
+	 *
+	 * @param   string  the HTTP method (GET, PUT, POST, DELETE)
+	 * @return  array   a list of CURL options for the desired request
+	 */
+	protected function _get_curl_options($method)
 	{
 		// If we do not understand the desired method
-		if ( ! in_array($method, array(self::HTTP_GET, self::HTTP_PUT, self::HTTP_POST, self::HTTP_DELETE)))
+		if ( ! in_array($method, array(self::HTTP_GET/*, self::HTTP_PUT, self::HTTP_POST, self::HTTP_DELETE*/)))
 		{
-			throw new Kohana_Exception('Unknown HTTP method requested :method',
+			throw new Kohana_Exception('Unknown HTTP method :method requested',
 				array(':method' => $method));
 		}
 
 		// Determine what the CURL options should be for this request (see http://us.php.net/curl_setopt)
-		switch ($method) {
+		switch ($method)
+		{
+			case self::HTTP_GET:
+				return array(); // No options
+		}
+	}
+
+	/**
+	 * Tries to parse the response text returned from an HTTP request into a document
+	 *
+	 * @param   string  the string returned from the HTTP request
+	 * @return  mixed   the parsed document
+	 */
+	protected function _parse_document($json)
+	{
+		// Attempt to parse the response text as a JSON document
+		$document = json_decode($json_text);
+
+		// If the JSON text that was passed in was not null, but the document was parsed as NULL
+		if ($json_text !== 'null' AND $document === NULL)
+		{
+			throw new Kohana_Exception('Invalid JSON returned from :uri',
+				array(':uri' => $uri));
 		}
 
-		// Make the HTTP request out to the database and get the result
+		// Make sure that we dont have an error in the response
+		$this->_handle_error($document);
 
+		// Return the parsed document
+		return $document;
 	}
 
 	/**
 	 * Throws an exception if there is an error member in the document
+	 *
+	 * @return  void
 	 */
 	protected function _handle_error($document)
 	{
-
+		// If the document has no _id but has error and reason members
+		if (is_object($document) AND ! isset($document->_id) AND isset($document->error) AND isset($document->reason))
+		{
+			throw new Kohana_Exception('Database server returned Error: :error with Reason: :reason',
+				array(':error' => $document->error, ':reason' => $document->reason));
+		}
 	}
 
 }
