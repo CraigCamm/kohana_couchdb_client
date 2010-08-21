@@ -14,5 +14,5 @@ formatting. To this end, suggestions are welcome.
 
 For more information on CouchDB or the Kohana framework, see:
 
-* http://couchdb.apache.org/
-* http://kohanaframework.org/
+* [http://couchdb.apache.org/]
+* [http://kohanaframework.org/]
