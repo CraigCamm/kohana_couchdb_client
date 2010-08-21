@@ -140,11 +140,21 @@ class CouchDB_Client {
 	/**
 	 * Builds the URI for the request using the configuration data and passed document id
 	 *
-	 * @return  string  the URI where the requested document can be located
+	 * @param   string   the document id we are requesting
+	 * @param   boolean  if we should add the database onto the end of the uri or not. Defaults to TRUE
+	 * @return  string   the URI where the requested document can be located
 	 */
-	protected function _build_uri($id)
+	protected function _build_uri($id, $database = TRUE)
 	{
+		$uri = $this->_config['host'];
 
+		// If we should add the database part onto the end
+		if ($database) {
+			$uri .= $this->_config['database'];
+		}
+
+		// Return the finished URI
+		return $uri;
 	}
 
 	/**
