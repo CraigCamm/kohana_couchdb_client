@@ -60,4 +60,37 @@ class CouchDB_Client {
 		return CouchDB_Client::$instances[$name];
 	}
 
+	/**
+	 * @var  object  the last CouchDB_Query object that was executed
+	 */
+	public $last_query;
+
+	// Instance name
+	protected $_instance;
+
+	// Raw server connection
+	protected $_connection;
+
+	// Configuration array
+	protected $_config;
+
+	/**
+	 * Stores the client configuration locally and names the instance.
+	 *
+	 * [!!] This method cannot be accessed directly, you must use [CouchDB_Client::instance].
+	 *
+	 * @return  void
+	 */
+	protected function __construct($name, array $config)
+	{
+		// Set the instance name
+		$this->_instance = $name;
+
+		// Store the config locally
+		$this->_config = $config;
+
+		// Store this client instance
+		CouchDB_Client::$instances[$name] = $this;
+	}
+
 }
