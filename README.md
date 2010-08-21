@@ -4,6 +4,7 @@ Kohana CouchDB Client hopes to provide a simple API for working with Apache
 CouchDB from the Kohana PHP web framework.
 
 This project is currently being developed against:
+
 * Kohana 3.0.7
 
 In anticipation that one day this work may be included in the Kohana mainline,
