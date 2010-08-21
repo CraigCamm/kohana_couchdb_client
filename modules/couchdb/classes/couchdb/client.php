@@ -145,6 +145,8 @@ class CouchDB_Client {
 		}
 
 		// Determine what the CURL options should be for this request (see http://us.php.net/curl_setopt)
+		switch ($method) {
+		}
 
 		// Make the HTTP request out to the database and get the result
 
