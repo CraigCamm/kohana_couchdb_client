@@ -13,16 +13,51 @@
 class CouchDB_Client {	
 
 	/**
-	 * @var  array  CouchDB Client instances
+	 * @var  string  default instance name
 	 */
-	protected static $instances = array();
+	public static $default = 'default';
 
 	/**
-	 * Returns a new instance of this class is one has not been created yet
+	 * @var  array  Database instances
+	 */
+	public static $instances = array();
+
+	/**
+	 * Get a singleton CouchDB_Client instance. If configuration is not
+	 * specified, it will be loaded from the couchdb configuration file using
+	 * the same group as the name.
+	 *
+	 *     // Load the default client instance
+	 *     $client = CouchDB_Client::instance();
+	 *
+	 *     // Create a custom configured instance
+	 *     $client = CouchDB_Client::instance('custom', $config);
+	 *
+	 * @param   string   instance name
+	 * @param   array    configuration parameters
+	 * @return  CouchDB_Client
 	 */
 	public static function instance($name = NULL)
 	{
-		// If we have already create an instance 
+		if ($name === NULL)
+		{
+			// Use the default instance name
+			$name = CouchDB_Client::$default;
+		}
+
+		if ( ! isset(CouchDB_Client::$instances[$name]))
+		{
+			if ($config === NULL)
+			{
+				// Load the configuration for this client
+				$config = Kohana::config('couchdb')->$name;
+			}
+
+			// Create the client instance
+			new CouchDB_Client($name, $config);
+		}
+
+		return CouchDB_Client::$instances[$name];
 	}
 
 }
