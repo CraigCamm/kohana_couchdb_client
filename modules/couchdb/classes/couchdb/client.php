@@ -141,7 +141,7 @@ class CouchDB_Client {
 	 * @param   string  the string returned from the HTTP request
 	 * @return  mixed   the parsed document
 	 */
-	protected function _parse_document($json)
+	protected function _parse_document($json_text)
 	{
 		// Attempt to parse the response text as a JSON document
 		$document = json_decode($json_text);
