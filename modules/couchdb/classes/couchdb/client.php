@@ -37,7 +37,7 @@ class CouchDB_Client {
 	 * @param   array    configuration parameters
 	 * @return  CouchDB_Client
 	 */
-	public static function instance($name = NULL)
+	public static function instance($name = NULL, $config = NULL)
 	{
 		if ($name === NULL)
 		{
