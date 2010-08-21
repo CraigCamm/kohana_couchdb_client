@@ -69,6 +69,9 @@ class CouchDB_Client {
 	// Holds document objects requested and sent during this session
 	protected $_documents;
 
+	// Holds the name we will use for the REST client
+	protected $_rest_client;
+
 	/**
 	 * Stores the client configuration locally and names the instance.
 	 *
@@ -86,6 +89,14 @@ class CouchDB_Client {
 
 		// Store this client instance
 		self::$instances[$name] = $this;
+
+		// Come up with a name for the rest client
+		$this->_rest_client = 'couchdb_'.$this->_instance.'_rest_client';
+
+		// Set up the rest client instance
+		REST_Client::instance($this->_rest_client, array(
+			'uri' => $this->_config['host']
+		));
 	}
 
 	/**
@@ -108,82 +119,20 @@ class CouchDB_Client {
 	 */
 	protected function _get_document($id)
 	{
-		// Determine what the URI for this request should be
-		$uri = $this->_build_uri($id);
+		// Grab the database name from the config
+		$database = $this->_config['database'];
 
-		// Make the HTTP request out to the database and get the result
-		$json = $this->_http(self::HTTP_GET, $uri);
+		// Make the HTTP request out to the database using the rest client
+		$response = REST_Client::instance($this->_rest_client)->get($database.'/'.$id);
 
 		// Attempt to parse the response text into an object
-		$document = $this->_parse_document($json);
+		$document = $this->_parse_document($response->data);
 
 		// Store the requested document
 		$this->_documents[$id] = $document;
 
 		// Return the document
 		return $document;
-	}
-
-	/**
-	 * Builds the URI for the request using the configuration data and passed document id
-	 *
-	 * @param   string   the document id we are requesting
-	 * @param   boolean  if we should add the database onto the end of the uri or not. Defaults to TRUE
-	 * @return  string   the URI where the requested document can be located
-	 */
-	protected function _build_uri($id, $database = TRUE)
-	{
-		$uri = $this->_config['host'];
-
-		// If we should add the database part onto the end
-		if ($database) {
-			$uri .= $this->_config['database'];
-		}
-
-		// Return the finished URI
-		return $uri;
-	}
-
-	/**
-	 * Gets the document that was requested from the database
-	 *
-	 * @param   string  the HTTP method (GET, PUT, POST, DELETE)
-	 * @param   string  the URI that we are requesting
-	 * @return  mixed   the response text from the remote URI
-	 */
-	protected function _http($method, $uri)
-	{
-		// Determine what the CURL options are for this request
-		$options = $this->_get_curl_options($method);
-
-		// Make the HTTP request out to the database and get the result
-		$response_text = Remote::get($uri, $options);
-
-		// Return the document result
-		return $response_text;
-	}
-
-	/**
-	 * Returns an array of CURL options required to make the HTTP request work
-	 *
-	 * @param   string  the HTTP method (GET, PUT, POST, DELETE)
-	 * @return  array   a list of CURL options for the desired request
-	 */
-	protected function _get_curl_options($method)
-	{
-		// If we do not understand the desired method
-		if ( ! in_array($method, array(self::HTTP_GET/*, self::HTTP_PUT, self::HTTP_POST, self::HTTP_DELETE*/)))
-		{
-			throw new Kohana_Exception('Unknown HTTP method :method requested',
-				array(':method' => $method));
-		}
-
-		// Determine what the CURL options should be for this request (see http://us.php.net/curl_setopt)
-		switch ($method)
-		{
-			case self::HTTP_GET:
-				return array(); // No options
-		}
 	}
 
 	/**
