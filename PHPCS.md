@@ -1,3 +1,3 @@
 PHP files can be validated using PEAR PHP_CodeSniffer as follows
 
- phpcs --standard=Kohan [filename.php]
+ phpcs --standard=Kohana [filename.php]
