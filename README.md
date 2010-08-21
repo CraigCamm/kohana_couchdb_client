@@ -7,6 +7,7 @@ This project is currently being developed against:
 
 * [CouchDB][] 0.10.0
 * [Kohana][] 3.0.7 (current stable tag)
+* [Kohana REST Client][] HEAD
 
 In anticipation that one day this work may be included in the Kohana mainline,
 this project aims to closely follow the same general spirit of the Kohana
@@ -15,3 +16,4 @@ formatting. To this end, suggestions are welcome.
 
 [CouchDB]: http://couchdb.apache.org/
 [Kohana]: http://kohanaframework.org/
+[Kohana REST Client]: http://github.com/sheatrevor/kohana_rest_client
