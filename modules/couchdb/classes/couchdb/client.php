@@ -61,18 +61,26 @@ class CouchDB_Client {
 	}
 
 	/**
-	 * @var  object  the last CouchDB_Query object that was executed
+	 * Constants for HTTP methods
+	 */
+	const HTTP_GET    = 'GET';
+	const HTTP_PUT    = 'PUT';
+	const HTTP_POST   = 'POST';
+	const HTTP_DELETE = 'DELETE';
+
+	/**
+	 * @var  object  the last query that was executed
 	 */
 	public $last_query;
 
 	// Instance name
 	protected $_instance;
 
-	// Raw server connection
-	protected $_connection;
-
 	// Configuration array
 	protected $_config;
+
+	// Holds document objects requested and sent during this session
+	protected $_documents;
 
 	/**
 	 * Stores the client configuration locally and names the instance.
@@ -90,7 +98,64 @@ class CouchDB_Client {
 		$this->_config = $config;
 
 		// Store this client instance
-		CouchDB_Client::$instances[$name] = $this;
+		self::$instances[$name] = $this;
+	}
+
+	/**
+	 * Gets the document that was requested, caches its information locally, and returns it
+	 *
+	 * @param   string  the document id that we are requesting
+	 * @return  mixed   the parsed document
+	 */
+	public function __get($id)
+	{
+		// Get the requested document
+		$this->_documents[$id] = $this->_get_document($id);
+
+		// Return the requested document
+		return $this->_documents[$id];
+	}
+
+	/**
+	 * Gets the document that was requested from the database
+	 *
+	 * @param   string  the document id that we are requesting
+	 * @return  mixed   the parsed document
+	 */
+	protected function _get_document($id)
+	{
+		// Make the HTTP request out to the database and get the result
+		$this->_http(self::HTTP_GET, $id);
+	}
+
+	/**
+	 * Gets the document that was requested from the database
+	 *
+	 * @param   string  the HTTP method (GET, PUT, POST, DELETE)
+	 * @param   string  the document id that we are requesting
+	 * @return  mixed   the parsed document
+	 */
+	protected function _http($method, $id)
+	{
+		// If we do not understand the desired method
+		if ( ! in_array($method, array(self::HTTP_GET, self::HTTP_PUT, self::HTTP_POST, self::HTTP_DELETE)))
+		{
+			throw new Kohana_Exception('Unknown HTTP method requested :method',
+				array(':method' => $method));
+		}
+
+		// Determine what the CURL options should be for this request (see http://us.php.net/curl_setopt)
+
+		// Make the HTTP request out to the database and get the result
+
+	}
+
+	/**
+	 * Throws an exception if there is an error member in the document
+	 */
+	protected function _handle_error($document)
+	{
+
 	}
 
 }
