@@ -60,19 +60,6 @@ class CouchDB_Client {
 		return CouchDB_Client::$instances[$name];
 	}
 
-	/**
-	 * Constants for HTTP methods
-	 */
-	const HTTP_GET    = 'GET';
-	const HTTP_PUT    = 'PUT';
-	const HTTP_POST   = 'POST';
-	const HTTP_DELETE = 'DELETE';
-
-	/**
-	 * @var  object  the last query that was executed
-	 */
-	public $last_query;
-
 	// Instance name
 	protected $_instance;
 
