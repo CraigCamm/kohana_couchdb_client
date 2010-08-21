@@ -1,27 +1,12 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 return array(
-	'database' => array(
+	'default' => array(
 		/**
-		 * Database settings for session storage.
-		 *
-		 * string   group  configuation group name
-		 * string   table  session table name
-		 * integer  gc     number of requests before gc is invoked
-		 * columns  array  custom column names
+		 * host:     the location and protocol of the couchdb server
+		 * database: the name of the database in the couchdb server
 		 */
-		'group'   => 'default',
-		'table'   => 'sessions',
-		'gc'      => 500,
-		'columns' => array(
-			/**
-			 * session_id:  session identifier
-			 * last_active: timestamp of the last activity
-			 * contents:    serialized session data
-			 */
-			'session_id'  => 'session_id',
-			'last_active' => 'last_active',
-			'contents'    => 'contents'
-		),
-	),
+		'host'     => 'http://127.0.0.1/',
+		'database' => 'default'
+	)
 );
