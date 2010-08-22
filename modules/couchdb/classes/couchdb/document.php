@@ -66,7 +66,7 @@ class CouchDB_Document {
 		$this->_changed = FALSE;
 
 		// Attempt to load this document
-		$this->_loaded = ! $this->_load();
+		$this->_loaded = $this->_load();
 	}
 
 	/**
