@@ -17,9 +17,9 @@ class CouchDB_Document {
 	public static $default = 'default';
 
 	/**
-	 * @var  array  holds the group name that this document belongs to
+	 * @var  object  holds a reference to the CouchDB Client we are using to connect to the database
 	 */
-	protected $_group;
+	protected $_couchdb;
 
 	/**
 	 * @var  string  holds the document id
@@ -45,7 +45,7 @@ class CouchDB_Document {
 	 * Manages a single document
 	 *
 	 * @param   string  if set, the document id that we should load
-	 * @param   string  the name of the configuration group this document should belong to
+	 * @param   string  the name of the CouchDB database connection configuration group
 	 * @return  void
 	 */
 	public function __construct($id = NULL, $group = NULL)
@@ -59,8 +59,8 @@ class CouchDB_Document {
 		// Assign the id
 		$this->_id = $id;
 
-		// Store the name of the configuration group
-		$this->_group = $group;
+		// Grab a reference to the CouchDB Client class instance
+		$this->_couchdb = CouchDB_Client::instance($group);
 
 		// This document has not yet had any changes made to it
 		$this->_changed = FALSE;
@@ -130,7 +130,7 @@ class CouchDB_Document {
 			$id = $this->_id;
 
 			// Attempt to load the document data
-			$this->_data = CouchDB_Client::instance($this->_group)->$id;
+			$this->_data = $this->_couchdb->get_document($id);
 
 			// The document was successfully loaded
 			return TRUE;
@@ -141,8 +141,9 @@ class CouchDB_Document {
 			// If the exception indicates that the document is unavailable
 			if ($exception instanceof CouchDB_Unavailable_Document_Exception)
 			{
-				// Make data empty
+				// Initialize the data area
 				$this->_data = new stdClass;
+				$this->_data->_id = $this->_id;
 
 				// We were not able to load this document
 				return FALSE;
@@ -169,15 +170,29 @@ class CouchDB_Document {
 			// Use the id that was most recently loaded
 			$id = $this->_id;
 		}
-
-		// If the document was loaded from a previous version
-		if ($this->_loaded)
+		else
 		{
+			// Store the new id value that was passed in
+			$this->_id = $id;
+		}
 
+		// Overwrite whatever may be there with the actual document id
+		$this->_data->_id = $this->_id;
 
+		// If this document is new
+		if ( ! $this->_loaded)
+		{
+			// Try to put this new document up on the server
+			$this->_couchdb->put_document($this->_id, $this->_data);
 		}
 		else
 		{
+			// If changes were made
+			if ($this->_changed)
+			{
+				// Save the changes that were made to this document
+				$this->_couchdb->post_document($this->_id, $this->_data);
+			}
 		}
 	}
 

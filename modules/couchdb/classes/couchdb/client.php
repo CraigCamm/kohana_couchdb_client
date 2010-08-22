@@ -97,7 +97,7 @@ class CouchDB_Client {
 	}
 
 	/**
-	 * Gets the document that was requested, caches its information locally, and returns it
+	 * Alias/Shortcut method for get_document
 	 *
 	 * @param   string  the document id that we are requesting
 	 * @return  mixed   the parsed document
@@ -105,7 +105,7 @@ class CouchDB_Client {
 	public function __get($id)
 	{
 		// Get the requested document and return it
-		return $this->_get_document($id);
+		return $this->get_document($id);
 	}
 
 	/**
@@ -114,7 +114,7 @@ class CouchDB_Client {
 	 * @param   string  the document id that we are requesting
 	 * @return  mixed   the parsed document
 	 */
-	protected function _get_document($id)
+	public function get_document($id)
 	{
 		// Grab the database name from the config
 		$database = $this->_config['database'];
@@ -127,6 +127,69 @@ class CouchDB_Client {
 
 		// Return the document
 		return $document;
+	}
+
+	/**
+	 * Alias/Shortcut method for put_document
+	 *
+	 * @param   string  the document id that we are adding to the database
+	 * @param   mixed   the document data
+	 * @return  void
+	 */
+	public function __set($id, $data)
+	{
+		// Put the new document up on the database server
+		$this->put_document($id, $data);
+	}
+
+	/**
+	 * Puts a new document onto the database server
+	 *
+	 * @param   string  the document id that we are adding to the database
+	 * @param   mixed   the document data
+	 * @return  void
+	 */
+	public function put_document($id, $data)
+	{
+		// Grab the database name from the config
+		$database = $this->_config['database'];
+
+		// Parse the data into a JSON string
+		$json_text = json_encode($data);
+
+		// Make the HTTP request out to the database using the rest client
+		$response = $this->_rest_client->put($database.'/'.$id, $json_text);
+
+		// Attempt to parse the response text into an object
+		$response = $this->_parse_document($response->data, $response->status);
+
+		// Return the response
+		return $response;
+	}
+
+	/**
+	 * Posts a new document onto the database server
+	 *
+	 * @param   string  the document id that we are updating in the database
+	 * @param   mixed   the document data
+	 * @return  void
+	 */
+	public function post_document($id, $data)
+	{
+		// Grab the database name from the config
+		$database = $this->_config['database'];
+
+		// Parse the data into a JSON string
+		$json_text = json_encode($data);
+
+		// Make the HTTP request out to the database using the rest client
+		$response = $this->_rest_client->post($database.'/'.$id, $json_text);
+
+		// Attempt to parse the response text into an object
+		$response = $this->_parse_document($response->data, $response->status);
+
+		// Return the response
+		return $response;
 	}
 
 	/**
