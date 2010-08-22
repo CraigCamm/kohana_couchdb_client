@@ -256,7 +256,7 @@ class CouchDB_Client {
 			throw new CouchDB_Unavailable_Database_Exception('Database server returned Error: ":error" with reason ":reason"',
 				array(':error' => $error, ':reason' => $reason), $status);
 		}
-		elseif ($error === 'not_found' AND $reason === 'missing')
+		elseif ($error === 'not_found')
 		{
 			// Throw the appropriate exception
 			throw new CouchDB_Unavailable_Document_Exception('Database server returned Error: ":error" with reason ":reason"',
