@@ -141,6 +141,9 @@ class CouchDB_Document {
 			// If the exception indicates that the document is unavailable
 			if ($exception instanceof CouchDB_Unavailable_Document_Exception)
 			{
+				// Make data empty
+				$this->_data = new stdClass;
+
 				// We were not able to load this document
 				return FALSE;
 			}

@@ -189,6 +189,12 @@ class CouchDB_Client {
 			throw new CouchDB_Unavailable_Database_Exception('Database server returned Error: ":error" with reason ":reason"',
 				array(':error' => $error, ':reason' => $reason), $status);
 		}
+		elseif ($error === 'not_found' AND $reason === 'missing')
+		{
+			// Throw the appropriate exception
+			throw new CouchDB_Unavailable_Document_Exception('Database server returned Error: ":error" with reason ":reason"',
+				array(':error' => $error, ':reason' => $reason), $status);
+		}
 
 		// If we are all the way down here, we arent sure what is going on so we throw a generic exception
 		throw new Kohana_Exception('Database server returned Error: :error with Reason: :reason',
