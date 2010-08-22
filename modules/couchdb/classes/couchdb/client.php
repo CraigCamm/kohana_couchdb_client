@@ -164,8 +164,8 @@ class CouchDB_Client {
 	 */
 	protected function _handle_error($status, $document)
 	{
-		// If the status code that was returned was HTTP_SUCCESS
-		if ($status === REST_Client::HTTP_SUCCESS)
+		// If the status code that was returned was HTTP_OK
+		if ($status === REST_Client::HTTP_OK)
 		{
 			return;
 		}
