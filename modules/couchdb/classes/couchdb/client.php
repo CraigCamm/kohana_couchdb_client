@@ -88,7 +88,7 @@ class CouchDB_Client {
 		self::$instances[$name] = $this;
 
 		// Come up with a name for the rest client
-		$rest_client_name = 'couchdb_'.$this->_instance.'_rest_client_'.sha1((string) microtime());
+		$rest_client_name = 'couchdb_'.$this->_instance.'_rest_client_'.sha1( (string) microtime());
 
 		// Set up the rest client instance
 		$this->_rest_client = REST_Client::instance($rest_client_name, array(
@@ -149,7 +149,7 @@ class CouchDB_Client {
 		}
 
 		// Make sure that we dont have an error in the response
-		$this->_handle_error((int) $status, $document);
+		$this->_handle_error( (int) $status, $document);
 
 		// Return the parsed document
 		return $document;
@@ -179,8 +179,8 @@ class CouchDB_Client {
 		}
 
 		// Try to grab the error and reason codes if they are available
-		$error = isset($document->error) ? $document->error : NULL;
-		$reason = isset($document->reason) ? $document->reason : NULL;
+		$error = isset($document->error) ? ($document->error) : (NULL);
+		$reason = isset($document->reason) ? ($document->reason) : (NULL);
 
 		// If requested database does not exist
 		if ($error === 'not_found' AND $reason === 'no_db_file')
