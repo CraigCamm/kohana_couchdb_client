@@ -66,7 +66,7 @@ class CouchDB_Client {
 	// Configuration array
 	protected $_config;
 
-	// Holds the name we will use for the REST client
+	// Holds on to a reference to the rest client
 	protected $_rest_client;
 
 	/**
@@ -88,10 +88,10 @@ class CouchDB_Client {
 		self::$instances[$name] = $this;
 
 		// Come up with a name for the rest client
-		$this->_rest_client = 'couchdb_'.$this->_instance.'_rest_client';
+		$rest_client_name = 'couchdb_'.$this->_instance.'_rest_client_'.sha1((string) microtime());
 
 		// Set up the rest client instance
-		REST_Client::instance($this->_rest_client, array(
+		$this->_rest_client = REST_Client::instance($rest_client_name, array(
 			'uri' => $this->_config['host']
 		));
 	}
@@ -120,7 +120,7 @@ class CouchDB_Client {
 		$database = $this->_config['database'];
 
 		// Make the HTTP request out to the database using the rest client
-		$response = REST_Client::instance($this->_rest_client)->get($database.'/'.$id);
+		$response = $this->_rest_client->get($database.'/'.$id);
 
 		// Attempt to parse the response text into an object
 		$document = $this->_parse_document($response->data);
