@@ -232,7 +232,10 @@ class CouchDB_Client {
 	protected function _handle_error($status, $document)
 	{
 		// If the status code that was returned was 200, 201 or 202
-		if (in_array($status, array(REST_Client::HTTP_OK, REST_Client::HTTP_CREATED, REST_Client::HTTP_ACCEPTED))
+		if (in_array($status, array(
+			REST_Client::HTTP_OK,
+			REST_Client::HTTP_CREATED,
+			REST_Client::HTTP_ACCEPTED)))
 		{
 			return;
 		}
