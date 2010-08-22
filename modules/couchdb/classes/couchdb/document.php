@@ -17,14 +17,19 @@ class CouchDB_Document {
 	public static $default = 'default';
 
 	/**
-	 * @var  array  holds configuration data
+	 * @var  array  holds the group name that this document belongs to
 	 */
-	protected $_config;
+	protected $_group;
 
 	/**
-	 * @var  boolean  if this document is new or not
+	 * @var  boolean  if this document was loaded
 	 */
-	protected $_new;
+	public $_loaded;
+
+	/**
+	 * @var  boolean  if changes have occurred or not
+	 */
+	protected $_changed;
 
 	/**
 	 * @var  object  holds all of the document data
@@ -46,25 +51,36 @@ class CouchDB_Document {
 			$group = self::$default;
 		}
 
+		// Assign the id
+		$this->_id = $id;
+
 		// Store the name of the configuration group
 		$this->_group = $group;
 
-		// Assume this document is new
-		$this->_new = TRUE;
+		// This document has not yet had any changes made to it
+		$this->_changed = FALSE;
 
-		// If we were given a document id
-		if ($id !== NULL)
-		{
-			// Attempt to load this document
-			$this->_load($id);
-		}
+		// Attempt to load this document
+		$this->_loaded = ! $this->_load()
+	}
+
+	/**
+	 * Checks to see if a single named member of this document is set or not
+	 *
+	 * @param   string   the name of the member we are requesting
+	 * @return  boolean  if the named member exists
+	 */
+	public function __isset($name)
+	{
+		// Return if the named member exists or not
+		return isset($this->_data->$name);
 	}
 
 	/**
 	 * Returns a single named member of this document
 	 *
 	 * @param   string  the name of the member we are requesting
-	 * @return  mixed   the parsed document
+	 * @return  mixed   the data that was requested
 	 */
 	public function __get($name)
 	{
@@ -73,67 +89,88 @@ class CouchDB_Document {
 	}
 
 	/**
+	 * Sets a single named member of this document
+	 *
+	 * @param   string  the name of the member we are requesting
+	 * @param   mixed   the new value to assign
+	 * @return  void
+	 */
+	public function __set($name, $value)
+	{
+		// Assume that if we are setting a value the data has changed
+		$this->_changed = TRUE;
+
+		// Set the value that was passed in
+		$this->_data->$name = $value;
+	}
+
+	/**
 	 * Attempts to load this document
 	 *
-	 * @return  mixed  a reference to this class instance
+	 * @return  boolean  if we were able to load the document or not
 	 */
-	protected function _load($id)
+	protected function _load()
 	{
+		// If we do not have a document id
+		if ($this->_id === NULL)
+		{
+			// We were unable to load the document
+			return FALSE;
+		}
+
 		// The call to load will fail if the document is new
 		try {
+
+			// Grab the id of this document
+			$id = $this->_id;
 
 			// Attempt to load the document data
 			$this->_data = CouchDB_Client::instance($this->_group)->$id;
 
-			// Store the document id that was loaded
-			$this->_id = $id;
-
-			// Store the fact that this document is not new because we were able to load it
-			$this->_new = FALSE;
+			// The document was successfully loaded
+			return TRUE;
 
 		// Catch all exceptions
-		} catch ($exception) {
+		} catch (Exception $exception) {
 
 			// If the exception indicates that the document is unavailable
-			if ($exception instanceof CouchDB_Document_Unavailable_Exception)
+			if ($exception instanceof CouchDB_Unavailable_Document_Exception)
 			{
-				// Mark this document as new
-				$this->_new = TRUE;
+				// We were not able to load this document
+				return FALSE;
 			}
 			else
 			{
-				// We arent sure what to do, so re-throw the exception
+				// We arent sure what the issue is
 				throw $exception;
 			}
 
 		}
-
-		// Return a reference to this class instance
-		return $this;
 	}
 
 	/**
 	 * Saves any changes that were made to this document
 	 *
-	 * @param   string  if set, the document id that we should use to save the document
-	 * @param   string  the name of the configuration group this document should belong to
+	 * @param   string  if set, the document id that we should use to save this document
 	 * @return  object  a reference to this class instance
 	 */
-	public function save($id = NULL, $group = NULL)
+	public function save($id = NULL)
 	{
-		if ($group === NULL)
-		{
-			// Use the group name that was set in the constructor
-			$group = $this->_group;
-		}
-
 		if ($id === NULL)
 		{
 			// Use the id that was most recently loaded
 			$id = $this->_id;
 		}
 
-		// Try to save this document
+		// If the document was loaded from a previous version
+		if ($this->_loaded)
+		{
+
+
+		}
+		else
+		{
+		}
 	}
 
 }
