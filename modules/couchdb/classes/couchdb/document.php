@@ -130,7 +130,7 @@ class CouchDB_Document {
 			$id = $this->_id;
 
 			// Attempt to load the document data
-			$this->_data = $this->_couchdb->get_document($id);
+			$this->_data = $this->_couchdb->$id;
 
 			// The document was successfully loaded
 			return TRUE;
@@ -177,22 +177,13 @@ class CouchDB_Document {
 		}
 
 		// Overwrite whatever may be there with the actual document id
-		$this->_data->_id = $this->_id;
+		$this->_data->_id = $id;
 
-		// If this document is new
-		if ( ! $this->_loaded)
+		// If the document is new or changes were made
+		if ( ! $this->_loaded OR $this->_changed)
 		{
-			// Try to put this new document up on the server
-			$this->_couchdb->put_document($this->_id, $this->_data);
-		}
-		else
-		{
-			// If changes were made
-			if ($this->_changed)
-			{
-				// Save the changes that were made to this document
-				$this->_couchdb->post_document($this->_id, $this->_data);
-			}
+			// Save the changes that were made to this document
+			$this->_couchdb->$id = $this->_data;
 		}
 	}
 
