@@ -60,6 +60,9 @@ class CouchDB_Client {
 		return CouchDB_Client::$instances[$name];
 	}
 
+	// Content type header to send when doing a PUT or POST
+	const CONTENT_TYPE = 'application/json';
+
 	// Instance name
 	protected $_instance;
 
@@ -92,7 +95,8 @@ class CouchDB_Client {
 
 		// Set up the rest client instance
 		$this->_rest_client = REST_Client::instance($rest_client_name, array(
-			'uri' => $this->_config['host']
+			'uri' => $this->_config['host'],
+			'content_type' => self::CONTENT_TYPE
 		));
 	}
 
