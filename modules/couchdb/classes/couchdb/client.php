@@ -186,8 +186,8 @@ class CouchDB_Client {
 		if ($error === 'not_found' AND $reason === 'no_db_file')
 		{
 			// Throw the appropriate exception
-			throw new CouchDB_Unavailable_Database_Exception('Database server returned Error: ":error" with HTTP status ":status"',
-				array(':error' => (string) $document, ':status' => $status), $status);
+			throw new CouchDB_Unavailable_Database_Exception('Database server returned Error: ":error" with reason ":reason"',
+				array(':error' => $error, ':reason' => $reason), $status);
 		}
 
 		// If we are all the way down here, we arent sure what is going on so we throw a generic exception
