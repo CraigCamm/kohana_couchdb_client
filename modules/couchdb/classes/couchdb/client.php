@@ -175,14 +175,20 @@ class CouchDB_Client {
 		{
 			// Throw a general exception
 			throw new Kohana_Exception('Database server returned Error: ":error" with HTTP status ":status"',
-				array(':error' => (string) $document, ':status' => $status));
+				array(':error' => (string) $document, ':status' => $status), $status);
 		}
 
 		// Try to grab the error and reason codes if they are available
 		$error = isset($document->error) ? $document->error : NULL;
 		$reason = isset($document->reason) ? $document->reason : NULL;
 
-		// If the error is that we do not 
+		// If requested database does not exist
+		if ($error === 'not_found' AND $reason === 'no_db_file')
+		{
+			// Throw the appropriate exception
+			throw new CouchDB_Unavailable_Database_Exception('Database server returned Error: ":error" with HTTP status ":status"',
+				array(':error' => (string) $document, ':status' => $status), $status);
+		}
 
 		// If we are all the way down here, we arent sure what is going on so we throw a generic exception
 		throw new Kohana_Exception('Database server returned Error: :error with Reason: :reason',
