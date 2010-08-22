@@ -265,7 +265,7 @@ class CouchDB_Client {
 
 		// If we are all the way down here, we arent sure what is going on so we throw a generic exception
 		throw new Kohana_Exception('Database server returned Error: :error with Reason: :reason',
-			array(':error' => $document->error, ':reason' => $document->reason));
+			array(':error' => $error, ':reason' => $reason), $status);
 	}
 
 }
