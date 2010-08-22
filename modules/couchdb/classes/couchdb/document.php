@@ -17,27 +17,17 @@ class CouchDB_Document {
 	public static $default = 'default';
 
 	/**
-	 * @var  array  holds the name of the configuration group this document belongs to
+	 * @var  array  holds configuration data
 	 */
-	protected $_group;
+	protected $_config;
 
 	/**
-	 * @var  boolean  holds if this document is new or not
+	 * @var  boolean  if this document is new or not
 	 */
 	protected $_new;
 
 	/**
-	 * @var  string  holds the document id
-	 */
-	protected $_id;
-
-	/**
-	 * @var  string  holds the current document revision
-	 */
-	protected $_rev;
-
-	/**
-	 * @var  object  all of the data that is stored in this document
+	 * @var  object  holds all of the document data
 	 */
 	protected $_data;
 
@@ -59,11 +49,14 @@ class CouchDB_Document {
 		// Store the name of the configuration group
 		$this->_group = $group;
 
+		// Assume this document is new
+		$this->_new = TRUE;
+
 		// If we were given a document id
 		if ($id !== NULL)
 		{
 			// Attempt to load this document
-			$this->load($id);
+			$this->_load($id);
 		}
 	}
 
@@ -92,6 +85,12 @@ class CouchDB_Document {
 			// Attempt to load the document data
 			$this->_data = CouchDB_Client::instance($this->_group)->$id;
 
+			// Store the document id that was loaded
+			$this->_id = $id;
+
+			// Store the fact that this document is not new because we were able to load it
+			$this->_new = FALSE;
+
 		// Catch all exceptions
 		} catch ($exception) {
 
@@ -114,9 +113,6 @@ class CouchDB_Document {
 	}
 
 	/**
-	 * Reloads the 
-
-	/**
 	 * Saves any changes that were made to this document
 	 *
 	 * @param   string  if set, the document id that we should use to save the document
@@ -130,6 +126,14 @@ class CouchDB_Document {
 			// Use the group name that was set in the constructor
 			$group = $this->_group;
 		}
+
+		if ($id === NULL)
+		{
+			// Use the id that was most recently loaded
+			$id = $this->_id;
+		}
+
+		// Try to save this document
 	}
 
 }

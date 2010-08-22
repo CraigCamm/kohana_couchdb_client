@@ -66,9 +66,6 @@ class CouchDB_Client {
 	// Configuration array
 	protected $_config;
 
-	// Holds document objects requested and sent during this session
-	protected $_documents;
-
 	// Holds the name we will use for the REST client
 	protected $_rest_client;
 
@@ -127,9 +124,6 @@ class CouchDB_Client {
 
 		// Attempt to parse the response text into an object
 		$document = $this->_parse_document($response->data);
-
-		// Store the requested document
-		$this->_documents[$id] = $document;
 
 		// Return the document
 		return $document;
