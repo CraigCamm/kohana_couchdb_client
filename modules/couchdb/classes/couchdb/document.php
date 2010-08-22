@@ -22,6 +22,11 @@ class CouchDB_Document {
 	protected $_group;
 
 	/**
+	 * @var  string  holds the document id
+	 */
+	protected $_id;
+
+	/**
 	 * @var  boolean  if this document was loaded
 	 */
 	public $_loaded;
@@ -61,7 +66,7 @@ class CouchDB_Document {
 		$this->_changed = FALSE;
 
 		// Attempt to load this document
-		$this->_loaded = ! $this->_load()
+		$this->_loaded = ! $this->_load();
 	}
 
 	/**

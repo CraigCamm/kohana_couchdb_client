@@ -123,7 +123,7 @@ class CouchDB_Client {
 		$response = $this->_rest_client->get($database.'/'.$id);
 
 		// Attempt to parse the response text into an object
-		$document = $this->_parse_document($response->data);
+		$document = $this->_parse_document($response->data, $response->status);
 
 		// Return the document
 		return $document;
@@ -132,10 +132,11 @@ class CouchDB_Client {
 	/**
 	 * Tries to parse the response text returned from an HTTP request into a document
 	 *
-	 * @param   string  the string returned from the HTTP request
+	 * @param   string  the body returned from the request
+	 * @param   string  the status code that was returned by the request
 	 * @return  mixed   the parsed document
 	 */
-	protected function _parse_document($json_text)
+	protected function _parse_document($json_text, $status)
 	{
 		// Attempt to parse the response text as a JSON document
 		$document = json_decode($json_text);
@@ -148,7 +149,7 @@ class CouchDB_Client {
 		}
 
 		// Make sure that we dont have an error in the response
-		$this->_handle_error($document);
+		$this->_handle_error((int) $status, $document);
 
 		// Return the parsed document
 		return $document;
@@ -157,16 +158,35 @@ class CouchDB_Client {
 	/**
 	 * Throws an exception if there is an error member in the document
 	 *
+	 * @param   int   the status code that was returned by the request
+	 * @param   mixed the parsed document body
 	 * @return  void
 	 */
-	protected function _handle_error($document)
+	protected function _handle_error($status, $document)
 	{
-		// If the document has no _id but has error and reason members
-		if (is_object($document) AND ! isset($document->_id) AND isset($document->error) AND isset($document->reason))
+		// If the status code that was returned was HTTP_SUCCESS
+		if ($status === REST_Client::HTTP_SUCCESS)
 		{
-			throw new Kohana_Exception('Database server returned Error: :error with Reason: :reason',
-				array(':error' => $document->error, ':reason' => $document->reason));
+			return;
 		}
+
+		// If the document is not an object
+		if ( ! is_object($document))
+		{
+			// Throw a general exception
+			throw new Kohana_Exception('Database server returned Error: ":error" with HTTP status ":status"',
+				array(':error' => (string) $document, ':status' => $status));
+		}
+
+		// Try to grab the error and reason codes if they are available
+		$error = isset($document->error) ? $document->error : NULL;
+		$reason = isset($document->reason) ? $document->reason : NULL;
+
+		// If the error is that we do not 
+
+		// If we are all the way down here, we arent sure what is going on so we throw a generic exception
+		throw new Kohana_Exception('Database server returned Error: :error with Reason: :reason',
+			array(':error' => $document->error, ':reason' => $document->reason));
 	}
 
 }
