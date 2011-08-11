@@ -117,7 +117,7 @@ class CouchDB_Document {
     public function loaded()
     {
         // Return the loaded status
-        return $_loaded;
+        return $this->_loaded;
     }
 
 	/**
