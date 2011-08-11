@@ -109,6 +109,17 @@ class CouchDB_Document {
 		$this->_data->$name = $value;
 	}
 
+    /**
+     * Checks to see if a document exists and has been loaded
+     *
+     * @return  boolean  if the document is loaded
+     */
+    public function loaded()
+    {
+        // Return the loaded status
+        return $_loaded;
+    }
+
 	/**
 	 * Attempts to load this document
 	 *
