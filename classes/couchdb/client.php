@@ -170,6 +170,25 @@ class CouchDB_Client {
 		// Return the response
 		return $response;
 	}
+    
+    /**
+	 * Deletea a document from the database server
+	 *
+	 * @param   string  the document id that we are removing from the database
+	 * @return  void
+	 */
+	public function delete_document($id)
+	{
+		// Grab the database name from the config
+		$database = $this->_config['database'];
+
+		// Make the HTTP request out to the database using the rest client
+		$response = $this->_rest_client->delete($database.'/'.$id);
+
+		// Return the response
+		return $response;
+	}
+
 
 	/**
 	 * Posts a new document onto the database server
