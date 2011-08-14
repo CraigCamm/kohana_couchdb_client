@@ -177,13 +177,16 @@ class CouchDB_Client {
 	 * @param   string  the document id that we are removing from the database
 	 * @return  void
 	 */
-	public function delete_document($id)
+	public function delete_document($id, $data)
 	{
 		// Grab the database name from the config
 		$database = $this->_config['database'];
 
+        // Parse the data into a JSON string
+		$json_text = json_encode($data);
+
 		// Make the HTTP request out to the database using the rest client
-		$response = $this->_rest_client->delete($database.'/'.$id);
+		$response = $this->_rest_client->delete($database.'/'.$id, $data);
 
 		// Return the response
 		return $response;
@@ -202,7 +205,7 @@ class CouchDB_Client {
 		// Grab the database name from the config
 		$database = $this->_config['database'];
 
-		// Parse the data into a JSON string
+        // Parse the data into a JSON string
 		$json_text = json_encode($data);
 
 		// Make the HTTP request out to the database using the rest client

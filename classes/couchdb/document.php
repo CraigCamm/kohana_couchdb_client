@@ -41,6 +41,9 @@ class CouchDB_Document {
 	 */
     protected $_data;
 
+	/**
+	 * @var  object  delete  document
+	 */
 	protected $delete;
 
 	/**
@@ -117,12 +120,14 @@ class CouchDB_Document {
 	 * @param   string  the name of the member we are deleting
 	 * @return  object  a reference to this class instance
 	 */
-	public function delete($id)
+	public function delete($id, $rev)
 	{
-		// Delete
-        $this->_couchdb->delete_document($id);
+        // Delete
+       return  $this->_couchdb->delete_document($id,
+           (object) array('rev' => $rev)
+       );
 
-        return $this;
+       // return $this;
 	}
 
     /**
